@@ -739,31 +739,32 @@
   /* ─────────── CTA ─────────── */
   .final-cta {
     background: var(--bg-elev);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(196,240,87,0.35);
     border-radius: 24px;
-    padding: 80px 40px;
+    padding: 100px 40px;
     text-align: center;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 80px rgba(196,240,87,0.08), inset 0 1px 0 rgba(196,240,87,0.12);
   }
   .final-cta::before {
     content: '';
     position: absolute;
-    top: -200px;
+    top: -150px;
     left: 50%;
     transform: translateX(-50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(196,240,87,0.12), transparent 60%);
+    width: 800px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(196,240,87,0.18), transparent 60%);
     pointer-events: none;
   }
-  .final-cta-inner { position: relative; z-index: 1; max-width: 580px; margin: 0 auto; }
+  .final-cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
   .final-cta h2 {
-    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
     font-weight: 500;
     letter-spacing: -0.03em;
     line-height: 1.05;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
   .final-cta h2 em {
     font-family: var(--font-serif);
@@ -773,8 +774,9 @@
   }
   .final-cta p {
     color: var(--text-dim);
-    font-size: 1.05rem;
-    margin-bottom: 36px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 40px;
   }
 
   /* Form */
@@ -1123,14 +1125,14 @@
       Everything you need to <em>move buyers</em> from inquiry to keys.
     </h2>
     <p class="section-sub">
-      Corzy replaces the spreadsheets, the back-and-forth emails, and the hours of manual research with one AI workspace built for the way agents actually work.
+      Corzy replaces the spreadsheets, the back-and-forth emails, and the hours of manual research with one workspace built for the way agents actually work.
     </p>
 
     <div class="features">
       <div class="feature large">
         <div>
           <div class="feature-num">01 / Smart matching</div>
-          <h3>AI that knows what your buyer actually wants</h3>
+          <h3>Corzy knows what your buyer actually wants</h3>
           <p>Corzy turns a free-form buyer conversation into a structured profile, then ranks every active listing in your market by fit — schools, commute, lifestyle, budget, and the things buyers don't even know to ask for.</p>
         </div>
         <div class="feature-viz">
@@ -1216,7 +1218,7 @@
   <div class="container">
     <div class="final-cta">
       <div class="final-cta-inner">
-        <div class="section-label" style="justify-content: center; display: inline-flex;">Free trial · Limited spots</div>
+        <div class="section-label" style="justify-content: center; display: inline-flex; background: rgba(196,240,87,0.1); border: 1px solid rgba(196,240,87,0.3); border-radius: 100px; padding: 6px 16px; margin-bottom: 24px; color: var(--accent);">Free trial · Limited spots</div>
         <h2>Be one of the first <em>agents</em> on Corzy.</h2>
         <p>Join the waitlist and get free access during our private beta. We're onboarding a small group of agents to shape what Corzy becomes.</p>
 

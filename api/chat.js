@@ -1,11 +1,9 @@
-export const config = { runtime: 'edge' };
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return res.status(405).end('Method not allowed');
   }
 
-  const { system, user } = await req.json();
+  const { system, user } = req.body;
 
   const upstream = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -25,13 +23,19 @@ export default async function handler(req) {
 
   if (!upstream.ok) {
     const err = await upstream.text();
-    return new Response(err, { status: upstream.status });
+    return res.status(upstream.status).end(err);
   }
 
-  return new Response(upstream.body, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-    },
-  });
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+
+  const reader = upstream.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    res.write(decoder.decode(value, { stream: true }));
+  }
+  res.end();
 }
