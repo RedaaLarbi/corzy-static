@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relocation Guide Generator · Corzy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKENS (match corzy.html exactly) ── */
+  :root {
+    --bg: #0a0a0b;
+    --bg-elev: #111114;
+    --bg-card: #15151a;
+    --border: #1f1f25;
+    --border-bright: #2a2a32;
+    --text: #ffffff;
+    --text-dim: #b0b0bc;
+    --text-faint: #72727e;
+    --accent: #c4f057;
+    --accent-dim: #9bc442;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+    --font-mono: 'Geist Mono', ui-monospace, monospace;
+    --max-w: 900px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *::selection { background: var(--accent); color: var(--bg); }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: subpixel-antialiased;
+    overflow-x: hidden;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @keyframes orbPulse {
+    0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(196,240,87,0); }
+    50%      { transform: scale(1.08); box-shadow: 0 0 40px 8px rgba(196,240,87,0.15); }
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ── SHARED COMPONENTS ── */
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+    font-weight: 700; font-size: 0.78rem;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+
+  .section-label {
+    font-size: 0.74rem;
+    font-family: var(--font-mono);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .btn-primary {
+    background: var(--accent); color: var(--bg);
+    padding: 12px 22px; border-radius: 100px;
+    font-size: 0.92rem; font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    letter-spacing: -0.005em; white-space: nowrap;
+  }
+  .btn-primary:hover { background: #d6ff6b; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(196,240,87,0.25); }
+
+  .btn-secondary {
+    background: var(--bg-card); color: var(--text);
+    padding: 12px 22px; border-radius: 100px;
+    font-size: 0.92rem; font-weight: 500;
+    border: 1px solid var(--border-bright);
+    transition: all 0.2s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { background: var(--bg-elev); border-color: #383844; }
+
+  /* ── VIEW SYSTEM ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── ERROR BANNER ── */
+  .error-banner {
+    background: rgba(255,80,80,0.08);
+    border: 1px solid rgba(255,80,80,0.25);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    color: #ff6b6b;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .error-banner.show { display: block; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-section-divider {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 20px 0 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .form-section-divider:first-of-type { border-top: none; padding-top: 0; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label {
+    font-size: 0.74rem;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .form-field .req { color: var(--accent); margin-left: 2px; }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: var(--text-faint); }
+  .form-field input:focus,
+  .form-field select:focus { border-color: var(--accent); }
+  .form-field input.invalid,
+  .form-field select.invalid { border-color: #ff6b6b; }
+
+  .form-field select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2372727e' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .form-field select option { background: var(--bg-card); }
+
+  .form-field-full { margin-bottom: 12px; }
+
+  /* API key input wrapper */
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap input { padding-right: 44px; }
+  .input-toggle-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-faint); padding: 4px;
+    transition: color 0.2s; line-height: 0;
+  }
+  .input-toggle-btn:hover { color: var(--text-dim); }
+
+  /* Lifestyle tag pills */
+  .tag-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 2px;
+  }
+  .tag-option {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 100px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tag-option input[type="checkbox"] { display: none; }
+  .tag-option:hover { border-color: #383844; color: var(--text); }
+  .tag-option.checked {
+    background: rgba(196,240,87,0.1);
+    border-color: rgba(196,240,87,0.4);
+    color: var(--accent);
+  }
+
+  .form-submit {
+    background: var(--accent); color: var(--bg);
+    padding: 14px 28px; border-radius: 100px;
+    font-weight: 600; font-size: 0.95rem;
+    transition: all 0.2s; width: 100%;
+    letter-spacing: -0.01em; margin-top: 8px;
+  }
+  .form-submit:hover { background: #d6ff6b; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(196,240,87,0.2); }
+  .form-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .form-note {
+    font-size: 0.74rem;
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+
+  /* ── VIEW 1: FORM PAGE ── */
+  .form-page {
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 48px 24px 80px;
+    position: relative; z-index: 2;
+  }
+
+  .form-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 44px;
+    width: 100%; max-width: 640px;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.7s ease both;
+  }
+  @media (max-width: 600px) { .form-card { padding: 32px 24px; } }
+
+  .form-card::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(196,240,87,0.1), transparent 60%);
+    pointer-events: none;
+  }
+
+  .form-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .back-arrow {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border-bright);
+    color: var(--text-faint);
+    transition: all 0.2s;
+  }
+  .back-arrow:hover { border-color: #383844; color: var(--text); background: var(--bg-card); }
+
+  .form-title {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .form-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .form-subtitle {
+    font-size: 0.96rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-bottom: 32px;
+  }
+
+  /* ── VIEW 2: LOADING ── */
+  .loading-page {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px; text-align: center;
+    padding: 48px 24px;
+    position: relative; z-index: 2;
+  }
+
+  .loading-orb {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,240,87,0.25), transparent 70%);
+    border: 1px solid rgba(196,240,87,0.3);
+    animation: orbPulse 1.8s ease-in-out infinite;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .loading-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .loading-label {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: opacity 0.4s;
+  }
+
+  .stream-preview {
+    max-width: 520px; width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    line-height: 1.7;
+    min-height: 72px;
+    text-align: left;
+    word-break: break-word;
+    position: relative;
+  }
+  .stream-cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* ── VIEW 3: GUIDE ── */
+  .guide-page {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative; z-index: 2;
+  }
+
+  .guide-actions-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .guide-actions-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Guide header card */
+  .guide-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px; align-items: flex-start;
+    margin-bottom: 40px;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.6s 0.05s ease both;
+  }
+  @media (max-width: 600px) {
+    .guide-header { grid-template-columns: 1fr; padding: 24px; }
+  }
+  .guide-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), rgba(196,240,87,0.2), transparent);
+  }
+
+  .guide-buyer-name {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .guide-buyer-name em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .guide-criteria-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .criteria-tag {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--text-faint);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 11px;
+  }
+
+  .guide-agent-block { text-align: right; flex-shrink: 0; }
+  @media (max-width: 600px) { .guide-agent-block { text-align: left; } }
+  .guide-agent-name { font-weight: 500; font-size: 0.95rem; }
+  .guide-agent-brokerage { font-size: 0.82rem; color: var(--text-dim); margin-top: 4px; }
+  .guide-generated-date { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin-top: 8px; }
+
+  /* Intro */
+  .guide-intro {
+    font-size: 1rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    padding: 0 4px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  /* Neighborhood cards */
+  .neighborhood-grid { display: flex; flex-direction: column; gap: 20px; margin-bottom: 52px; }
+
+  .nbhd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .nbhd-card:hover { border-color: var(--border-bright); }
+  .nbhd-card::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; width: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(196,240,87,0.3), transparent);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .nbhd-card:hover::before { opacity: 1; }
+
+  .nbhd-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .nbhd-rank {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--text-faint); margin-bottom: 5px;
+  }
+  .nbhd-name { font-size: 1.3rem; font-weight: 500; letter-spacing: -0.02em; }
+
+  .fit-badge {
+    background: rgba(196,240,87,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(196,240,87,0.25);
+    padding: 6px 13px; border-radius: 100px;
+    font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600;
+    flex-shrink: 0; margin-left: 12px;
+  }
+  .fit-badge.secondary {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border-color: var(--border-bright);
+  }
+
+  .nbhd-rationale {
+    color: var(--text-dim); font-size: 0.93rem; line-height: 1.65;
+    margin-bottom: 22px;
+  }
+
+  .nbhd-meta-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 18px;
+  }
+  @media (max-width: 600px) { .nbhd-meta-grid { grid-template-columns: 1fr 1fr; } }
+
+  .nbhd-meta-item {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 13px 15px;
+  }
+  .nbhd-meta-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-faint); margin-bottom: 6px;
+  }
+  .nbhd-meta-value { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; }
+  .nbhd-meta-sub { font-size: 0.7rem; color: var(--text-faint); margin-top: 4px; font-family: var(--font-mono); }
+
+  .nbhd-lifestyle-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .lifestyle-tag {
+    font-size: 0.72rem; color: var(--text-dim);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 100px; padding: 3px 10px;
+  }
+
+  .nbhd-price-example {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 13px 16px;
+    font-size: 0.86rem; color: var(--text-dim); line-height: 1.55;
+  }
+  .nbhd-price-example strong { color: var(--text); }
+
+  .nbhd-tradeoff {
+    margin-top: 12px;
+    font-size: 0.8rem; color: var(--text-faint);
+    font-style: italic; line-height: 1.5;
+  }
+
+  /* Comparison table */
+  .comparison-section { margin-bottom: 52px; animation: fadeUp 0.6s 0.3s ease both; }
+  .comparison-intro {
+    color: var(--text-dim); font-size: 0.92rem; line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .comparison-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .comparison-table th {
+    background: var(--bg-elev); padding: 14px 18px;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-faint); text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .comparison-table th:not(:first-child) { text-align: center; }
+  .comparison-table th.col-triangle { color: var(--accent); }
+
+  .comparison-table td {
+    padding: 13px 18px; border-bottom: 1px solid var(--border);
+    font-size: 0.88rem; color: var(--text-dim); vertical-align: middle;
+  }
+  .comparison-table td:first-child {
+    font-family: var(--font-mono); font-size: 0.74rem;
+    color: var(--text-faint); white-space: nowrap;
+  }
+  .comparison-table td:not(:first-child) { text-align: center; }
+  .comparison-table td.win { color: var(--accent); font-weight: 500; }
+  .comparison-table tr:last-child td { border-bottom: none; }
+
+  /* Guide CTA strip */
+  .guide-cta {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 36px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 24px; flex-wrap: wrap;
+    position: relative; overflow: hidden;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  @media (max-width: 600px) { .guide-cta { padding: 28px 24px; } }
+
+  .guide-cta::before {
+    content: '';
+    position: absolute; top: -150px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 400px;
+    background: radial-gradient(circle, rgba(196,240,87,0.1), transparent 60%);
+    pointer-events: none;
+  }
+  .guide-cta-inner { position: relative; z-index: 1; }
+  .guide-cta h3 {
+    font-size: 1.3rem; font-weight: 500; letter-spacing: -0.02em;
+    margin-bottom: 8px; line-height: 1.2;
+  }
+  .guide-cta h3 em {
+    font-family: var(--font-serif); font-style: italic;
+    font-weight: 400; color: var(--accent);
+  }
+  .guide-cta p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
+  .guide-cta-actions { position: relative; z-index: 1; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .guide-footer-note {
+    text-align: center;
+    font-family: var(--font-mono); font-size: 0.66rem;
+    color: var(--text-faint); margin-top: 40px;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    #view-form, #view-loading, .guide-actions-bar, .guide-cta-actions { display: none !important; }
+    #view-guide { display: block !important; }
+    body { background: #fff; color: #111; }
+    body::before { display: none; }
+    :root {
+      --bg: #fff; --bg-elev: #f5f5f5; --bg-card: #fafafa;
+      --border: #e0e0e0; --border-bright: #d0d0d0;
+      --text: #111; --text-dim: #444; --text-faint: #888;
+      --accent: #4a7c00;
+    }
+    .nbhd-card, .guide-header, .guide-cta { box-shadow: none !important; }
+    .nbhd-card { page-break-inside: avoid; break-inside: avoid; }
+    .comparison-section { page-break-inside: avoid; break-inside: avoid; }
+    .fit-badge { background: #e8f5d0 !important; color: #4a7c00 !important; border-color: #b8d980 !important; }
+    a::after { content: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ VIEW 1: FORM ═══ -->
+<div id="view-form" class="view active">
+  <div class="form-page">
+    <div class="form-card">
+      <div style="position: relative; z-index: 1;">
+
+        <div class="form-card-header">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <a href="/" class="back-arrow" aria-label="Back to home">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            </a>
+            <a href="/" class="logo">
+              <div class="logo-mark">C</div>
+              Corzy
+            </a>
+          </div>
+          <div class="section-label" style="margin-bottom: 0;">Guide Generator</div>
+        </div>
+
+        <h1 class="form-title">Create a <em>personalized</em><br>relocation guide.</h1>
+        <p class="form-subtitle">Enter buyer criteria once. Get a beautiful, shareable Triangle Relocation Guide in under 20 seconds.</p>
+
+        <div class="error-banner" id="formError"></div>
+
+        <form id="criteriaForm" novalidate>
+
+          <!-- API KEY (hidden — key is hardcoded) -->
+          <input type="hidden" id="apiKey">
+
+          <!-- BUYER DETAILS -->
+          <div class="form-section-divider">Buyer Details</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="buyerName">Buyer first name <span class="req">*</span></label>
+              <input type="text" id="buyerName" placeholder="Sarah">
+            </div>
+            <div class="form-field">
+              <label for="originCity">Origin city <span class="req">*</span></label>
+              <input type="text" id="originCity" placeholder="Chicago">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="budget">Budget <span class="req">*</span></label>
+              <input type="text" id="budget" placeholder="$800K or $700K–$900K">
+            </div>
+            <div class="form-field">
+              <label for="bedrooms">Bedrooms</label>
+              <select id="bedrooms">
+                <option value="">Any</option>
+                <option value="2+">2+</option>
+                <option value="3+">3+</option>
+                <option value="4+">4+</option>
+                <option value="5+">5+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field form-field-full">
+            <label for="workplace">Workplace / commute destination</label>
+            <input type="text" id="workplace" placeholder="RTP, downtown Raleigh, Duke University…">
+          </div>
+
+          <!-- PRIORITIES -->
+          <div class="form-section-divider">Priorities</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="schoolPriority">Schools <span class="req">*</span></label>
+              <select id="schoolPriority">
+                <option value="high">High — top-rated required</option>
+                <option value="medium">Medium — good preferred</option>
+                <option value="low">Not a factor</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="timeline">Timeline</label>
+              <select id="timeline">
+                <option value="3 months">3 months</option>
+                <option value="6 months">6 months</option>
+                <option value="12 months">12 months</option>
+                <option value="Flexible">Flexible</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field form-field-full">
+            <label>Lifestyle priorities</label>
+            <div class="tag-grid" id="lifestyleGrid">
+              <label class="tag-option"><input type="checkbox" value="Walkable"> Walkable</label>
+              <label class="tag-option"><input type="checkbox" value="Good dining"> Good dining</label>
+              <label class="tag-option"><input type="checkbox" value="Parks &amp; outdoors"> Parks &amp; outdoors</label>
+              <label class="tag-option"><input type="checkbox" value="Quiet/suburban"> Quiet/suburban</label>
+              <label class="tag-option"><input type="checkbox" value="Young families"> Young families</label>
+              <label class="tag-option"><input type="checkbox" value="Short commute"> Short commute</label>
+            </div>
+          </div>
+
+          <!-- AGENT BRANDING -->
+          <div class="form-section-divider">Your Branding</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="agentName">Your name <span class="req">*</span></label>
+              <input type="text" id="agentName" placeholder="Alex Johnson">
+            </div>
+            <div class="form-field">
+              <label for="agentBrokerage">Brokerage</label>
+              <input type="text" id="agentBrokerage" placeholder="Compass, KW, EXP…">
+            </div>
+          </div>
+          <div class="form-field form-field-full">
+            <label for="agentContact">Contact info (shown on guide)</label>
+            <input type="text" id="agentContact" placeholder="(919) 555-0100 · alex@compass.com">
+          </div>
+
+          <button type="submit" class="form-submit" id="generateBtn">Generate Guide →</button>
+          <div class="form-note" style="text-align: center; margin-top: 14px;">Generation takes 15–25 seconds</div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ VIEW 2: LOADING ═══ -->
+<div id="view-loading" class="view">
+  <div class="loading-page">
+    <div class="loading-orb">
+      <div class="logo-mark" style="width: 28px; height: 28px; font-size: 0.88rem;">C</div>
+    </div>
+    <div>
+      <div class="loading-title">Building your guide…</div>
+    </div>
+    <div class="loading-label" id="loadingStatus">Analyzing buyer criteria…</div>
+    <div class="stream-preview" id="streamPreview">
+      <span id="streamText"></span><span class="stream-cursor"></span>
+    </div>
+    <button class="btn-secondary" id="cancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ VIEW 3: GUIDE ═══ -->
+<div id="view-guide" class="view">
+  <div class="guide-page">
+
+    <div class="guide-actions-bar">
+      <button class="btn-secondary" id="backBtn">← Back</button>
+      <div class="guide-actions-right">
+        <button class="btn-secondary" id="regenerateBtn">↺ Regenerate</button>
+        <button class="btn-primary" onclick="window.print()">↓ Print / Save PDF</button>
+      </div>
+    </div>
+
+    <div class="guide-header" id="guideHeader">
+      <div>
+        <div class="section-label">Triangle Relocation Guide</div>
+        <div class="guide-buyer-name" id="guideBuyerName"></div>
+        <div class="guide-criteria-tags" id="guideCriteriaTags"></div>
+      </div>
+      <div class="guide-agent-block">
+        <div class="guide-agent-name" id="guideAgentName"></div>
+        <div class="guide-agent-brokerage" id="guideAgentBrokerage"></div>
+        <div class="guide-generated-date" id="guideDate"></div>
+      </div>
+    </div>
+
+    <div class="guide-intro" id="guideIntro"></div>
+
+    <div class="section-label" id="nbhdSectionLabel" style="animation: fadeUp 0.6s 0.15s ease both;">Neighborhood Shortlist</div>
+    <div class="neighborhood-grid" id="neighborhoodGrid"></div>
+
+    <div class="comparison-section" id="comparisonSection">
+      <div class="section-label">What Your Budget Buys</div>
+      <p class="comparison-intro" id="comparisonIntro"></p>
+      <table class="comparison-table" id="comparisonTable"></table>
+    </div>
+
+    <div class="guide-cta" id="guideCta">
+      <div class="guide-cta-inner">
+        <h3 id="guideCtaHeadline"></h3>
+        <p id="guideCtaBody"></p>
+      </div>
+      <div class="guide-cta-actions">
+        <button class="btn-primary" id="guideCtaBtn">Schedule a Tour →</button>
+      </div>
+    </div>
+
+    <div class="guide-footer-note">Generated with Corzy · <span id="guideFooterAgent"></span></div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ STATE ═══════════════════════
+let currentCriteria = {};
+let currentGuideData = null;
+let abortController = null;
+let statusInterval = null;
+
+const KEY_NAME = 'corzy_anthropic_key';
+
+// ═══════════════════════ INIT ═══════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  loadSavedKey();
+  wireTagPills();
+  document.getElementById('criteriaForm').addEventListener('submit', handleFormSubmit);
+document.getElementById('cancelBtn').addEventListener('click', handleCancel);
+  document.getElementById('backBtn').addEventListener('click', handleBack);
+  document.getElementById('regenerateBtn').addEventListener('click', handleRegenerate);
+});
+
+// ═══════════════════════ VIEW SYSTEM ═══════════════════════
+function showForm() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-form').classList.add('active');
+  if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+}
+
+function showLoading() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-loading').classList.add('active');
+  document.getElementById('streamText').textContent = '';
+  startStatusRotation();
+}
+
+function showGuide() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-guide').classList.add('active');
+  if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════ API KEY ═══════════════════════
+function loadSavedKey() {
+  // key is handled server-side via Vercel env var
+}
+
+function saveKey(key) {
+  localStorage.setItem(KEY_NAME, key);
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('apiKey');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// ═══════════════════════ LIFESTYLE TAGS ═══════════════════════
+function wireTagPills() {
+  document.querySelectorAll('.tag-option').forEach(label => {
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.addEventListener('change', () => {
+      label.classList.toggle('checked', cb.checked);
+    });
+  });
+}
+
+function getSelectedTags() {
+  return Array.from(document.querySelectorAll('.tag-option input:checked')).map(i => i.value);
+}
+
+// ═══════════════════════ FORM ═══════════════════════
+function collectCriteria() {
+  return {
+    apiKey:          document.getElementById('apiKey').value.trim(),
+    buyerName:       document.getElementById('buyerName').value.trim(),
+    originCity:      document.getElementById('originCity').value.trim(),
+    budget:          document.getElementById('budget').value.trim(),
+    bedrooms:        document.getElementById('bedrooms').value,
+    workplace:       document.getElementById('workplace').value.trim(),
+    schoolPriority:  document.getElementById('schoolPriority').value,
+    timeline:        document.getElementById('timeline').value,
+    lifestyleTags:   getSelectedTags(),
+    agentName:       document.getElementById('agentName').value.trim(),
+    agentBrokerage:  document.getElementById('agentBrokerage').value.trim(),
+    agentContact:    document.getElementById('agentContact').value.trim(),
+  };
+}
+
+function validateCriteria(c) {
+  const errors = [];
+  const required = [
+    { id: 'buyerName',  val: c.buyerName,  msg: 'Buyer first name is required.' },
+    { id: 'originCity', val: c.originCity, msg: 'Origin city is required.' },
+    { id: 'budget',     val: c.budget,     msg: 'Budget is required.' },
+    { id: 'agentName',  val: c.agentName,  msg: 'Your name is required.' },
+  ];
+
+  // Clear previous invalid states
+  document.querySelectorAll('.form-field input, .form-field select').forEach(el => el.classList.remove('invalid'));
+
+  required.forEach(({ id, val, msg }) => {
+    if (!val) {
+      errors.push(msg);
+      document.getElementById(id).classList.add('invalid');
+    }
+  });
+
+  return errors;
+}
+
+function showFormError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearFormError() {
+  const el = document.getElementById('formError');
+  el.textContent = '';
+  el.classList.remove('show');
+}
+
+function handleFormSubmit(e) {
+  e.preventDefault();
+  clearFormError();
+  const criteria = collectCriteria();
+  const errors = validateCriteria(criteria);
+  if (errors.length) {
+    showFormError(errors[0]);
+    return;
+  }
+  saveKey(criteria.apiKey);
+  currentCriteria = criteria;
+  generate(criteria);
+}
+
+function populateFormFromCriteria(c) {
+  document.getElementById('buyerName').value  = c.buyerName  || '';
+  document.getElementById('originCity').value = c.originCity || '';
+  document.getElementById('budget').value     = c.budget     || '';
+  document.getElementById('bedrooms').value   = c.bedrooms   || '';
+  document.getElementById('workplace').value  = c.workplace  || '';
+  document.getElementById('schoolPriority').value = c.schoolPriority || 'high';
+  document.getElementById('timeline').value   = c.timeline   || '6 months';
+  document.getElementById('agentName').value  = c.agentName  || '';
+  document.getElementById('agentBrokerage').value = c.agentBrokerage || '';
+  document.getElementById('agentContact').value   = c.agentContact   || '';
+  // restore tag pills
+  document.querySelectorAll('.tag-option input').forEach(cb => {
+    cb.checked = (c.lifestyleTags || []).includes(cb.value);
+    cb.closest('.tag-option').classList.toggle('checked', cb.checked);
+  });
+}
+
+// ═══════════════════════ LOADING STATUS ═══════════════════════
+function startStatusRotation() {
+  const messages = [
+    'Analyzing buyer criteria…',
+    'Scoring Triangle neighborhoods…',
+    'Researching school data…',
+    'Estimating commute times…',
+    'Drafting your guide…',
+  ];
+  let i = 0;
+  const el = document.getElementById('loadingStatus');
+  el.textContent = messages[0];
+  statusInterval = setInterval(() => {
+    i = (i + 1) % messages.length;
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = messages[i]; el.style.opacity = '1'; }, 300);
+  }, 3500);
+}
+
+// ═══════════════════════ CANCEL / BACK / REGEN ═══════════════════════
+function handleCancel() {
+  if (abortController) abortController.abort();
+  showForm();
+  populateFormFromCriteria(currentCriteria);
+}
+
+function handleBack() {
+  showForm();
+  populateFormFromCriteria(currentCriteria);
+}
+
+function handleRegenerate() {
+  generate(currentCriteria);
+}
+
+// ═══════════════════════ API CALL ═══════════════════════
+async function callClaude(systemPrompt, userPrompt, _apiKey, onChunk) {
+  abortController = new AbortController();
+
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    signal: abortController.signal,
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ system: systemPrompt, user: userPrompt }),
+  });
+
+  if (!response.ok) {
+    let errMsg = `API error ${response.status}`;
+    try { const j = await response.json(); errMsg = j.error?.message || errMsg; } catch {}
+    if (response.status === 401) errMsg = 'API key rejected. Check that it is active and has Claude access.';
+    if (response.status === 429) errMsg = 'Rate limit reached. Wait a moment and try again.';
+    throw new Error(errMsg);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    for (const line of chunk.split('\n')) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim();
+      if (data === '[DONE]') continue;
+      try {
+        const event = JSON.parse(data);
+        if (event.type === 'content_block_delta' && event.delta?.text) {
+          fullText += event.delta.text;
+          onChunk(event.delta.text, fullText);
+        }
+      } catch {}
+    }
+  }
+  return fullText;
+}
+
+// ═══════════════════════ PROMPTS ═══════════════════════
+const SYSTEM_PROMPT = `You are a knowledgeable Triangle, NC real estate expert helping a buyer's agent create a personalized relocation guide. The Triangle is the Raleigh-Durham-Chapel Hill metro area of North Carolina.
+
+Neighborhoods you know deeply: Cary, Apex, Morrisville, Holly Springs, Fuquay-Varina, Wake Forest, Durham (Hope Valley, Woodcroft, South Square, Downtown), Chapel Hill, Carrboro, Raleigh (North Hills, Cameron Village, Brier Creek, Five Points, Midtown), Garner, Clayton, Knightdale, Wendell.
+
+School data: Use GreatSchools rating scale (1–10). Provide plausible, characteristic ratings and real school names based on known area reputation. These are representative examples.
+
+Commute estimates: Provide realistic prose estimates ("about 18 minutes via I-540 with light traffic", "25–35 min depending on I-40 congestion"). Never just a single number.
+
+Tone: Warm, expert, honest. Acknowledge trade-offs. Write for a smart buyer who wants real information, not marketing copy.
+
+CRITICAL: Return ONLY a single valid JSON object. No markdown code fences. No preamble. No explanation. Just the raw JSON.`;
+
+function buildUserPrompt(c) {
+  return `Generate a Triangle Relocation Guide for this buyer:
+
+- Buyer first name: ${c.buyerName}
+- Origin city: ${c.originCity}
+- Budget: ${c.budget}
+- Bedrooms needed: ${c.bedrooms || 'not specified'}
+- Workplace / commute destination: ${c.workplace || 'RTP (Research Triangle Park)'}
+- School priority: ${c.schoolPriority}
+- Lifestyle priorities: ${c.lifestyleTags.length ? c.lifestyleTags.join(', ') : 'none specified'}
+- Timeline: ${c.timeline}
+- Agent: ${c.agentName}${c.agentBrokerage ? ', ' + c.agentBrokerage : ''}
+
+Return a JSON object with EXACTLY this structure:
+{
+  "intro": "2–3 sentence personalized intro mentioning their origin city and what makes the Triangle a great fit",
+  "neighborhoods": [
+    {
+      "name": "neighborhood name",
+      "fitScore": 85,
+      "fitLabel": "Top Match",
+      "rationale": "2–3 sentences explaining why this fits THIS specific buyer's criteria",
+      "schools": { "rating": 8, "topSchool": "School Name Elementary", "note": "1 sentence about district character" },
+      "commute": { "estimate": "prose estimate e.g. 18–22 min via I-540", "note": "optional traffic note" },
+      "lifestyle": ["tag1", "tag2"],
+      "priceExample": "what budget buys here, e.g. 4BR/3BA, ~2,800 sqft craftsman with 2-car garage",
+      "tradeoff": "1 honest sentence about a downside or consideration"
+    }
+  ],
+  "comparison": {
+    "intro": "1–2 sentences framing origin city vs Triangle",
+    "originCity": "${c.originCity}",
+    "rows": [
+      { "category": "Median home price", "originValue": "$XXX,XXX", "triangleValue": "$XXX,XXX", "triangleAdvantage": true },
+      { "category": "Sq ft for ${c.budget}", "originValue": "~X,XXX sqft", "triangleValue": "~X,XXX sqft", "triangleAdvantage": true },
+      { "category": "Property tax rate", "originValue": "X.X%", "triangleValue": "X.X%", "triangleAdvantage": true },
+      { "category": "State income tax", "originValue": "X–X%", "triangleValue": "X%", "triangleAdvantage": true },
+      { "category": "Cost of living index", "originValue": "XXX", "triangleValue": "XXX", "triangleAdvantage": true },
+      { "category": "Typical lot size", "originValue": "~X,XXX sqft", "triangleValue": "~X,XXX sqft", "triangleAdvantage": true },
+      { "category": "Average commute time", "originValue": "XX min", "triangleValue": "XX min", "triangleAdvantage": true }
+    ]
+  },
+  "cta": {
+    "headline": "personalized tour CTA headline",
+    "body": "1–2 sentences inviting the buyer to schedule tours, mentioning the agent's name (${c.agentName})",
+    "urgencyNote": "1 sentence about market conditions or timeline (optional, can be empty string)"
+  }
+}
+
+Select 3–4 neighborhoods that genuinely fit. Be specific and honest. The comparison data should reflect real-world differences between ${c.originCity} and the Triangle.`;
+}
+
+// ═══════════════════════ GENERATE ═══════════════════════
+async function generate(criteria) {
+  showLoading();
+  const streamEl = document.getElementById('streamText');
+
+  try {
+    const rawText = await callClaude(
+      SYSTEM_PROMPT,
+      buildUserPrompt(criteria),
+      criteria.apiKey,
+      (delta, full) => {
+        streamEl.textContent = full.slice(-300); // show last 300 chars
+      }
+    );
+
+    const guide = parseGuideJSON(rawText);
+    currentGuideData = guide;
+    renderGuide(guide, criteria);
+    showGuide();
+
+  } catch (err) {
+    if (err.name === 'AbortError') return; // user cancelled
+    showForm();
+    populateFormFromCriteria(criteria);
+    showFormError('Generation failed: ' + err.message);
+  }
+}
+
+// ═══════════════════════ JSON PARSING ═══════════════════════
+function parseGuideJSON(raw) {
+  let cleaned = raw.trim();
+  // Strip markdown fences if Claude wraps it anyway
+  const fence = cleaned.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fence) cleaned = fence[1].trim();
+  // Find outermost JSON object
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('No JSON found in response. Try regenerating.');
+  return JSON.parse(cleaned.slice(start, end + 1));
+}
+
+// ═══════════════════════ RENDER ═══════════════════════
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatDate() {
+  return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function renderGuide(guide, c) {
+  renderGuideHeader(guide, c);
+  renderIntro(guide, c);
+  renderNeighborhoodCards(guide, c);
+  renderComparisonTable(guide, c);
+  renderCTA(guide, c);
+  document.getElementById('guideFooterAgent').textContent = escapeHtml(c.agentName) + (c.agentBrokerage ? ' · ' + escapeHtml(c.agentBrokerage) : '');
+}
+
+function renderGuideHeader(guide, c) {
+  document.getElementById('guideBuyerName').innerHTML =
+    `<em>${escapeHtml(c.buyerName)}'s</em> Relocation Guide`;
+
+  const tags = [
+    c.budget,
+    c.bedrooms ? c.bedrooms + ' bed' : null,
+    c.workplace || 'RTP commute',
+    c.originCity + ' → Triangle',
+    c.timeline,
+  ].filter(Boolean);
+
+  document.getElementById('guideCriteriaTags').innerHTML =
+    tags.map(t => `<span class="criteria-tag">${escapeHtml(t)}</span>`).join('');
+
+  document.getElementById('guideAgentName').textContent = c.agentName;
+  document.getElementById('guideAgentBrokerage').textContent = c.agentBrokerage || '';
+  document.getElementById('guideDate').textContent = 'Generated ' + formatDate();
+}
+
+function renderIntro(guide, c) {
+  document.getElementById('guideIntro').innerHTML =
+    `<p>${escapeHtml(guide.intro)}</p>`;
+}
+
+function renderNeighborhoodCards(guide, c) {
+  const labels = ['Top Match', 'Strong Fit', 'Worth Considering', 'Also Consider'];
+  const grid = document.getElementById('neighborhoodGrid');
+  grid.innerHTML = guide.neighborhoods.map((n, i) => {
+    const isTop = n.fitScore >= 85;
+    const badgeClass = isTop ? 'fit-badge' : 'fit-badge secondary';
+    const tags = (n.lifestyle || []).map(t => `<span class="lifestyle-tag">${escapeHtml(t)}</span>`).join('');
+    const delay = (i * 0.1 + 0.2).toFixed(1);
+    return `
+      <div class="nbhd-card" style="animation: fadeUp 0.6s ${delay}s ease both;">
+        <div class="nbhd-top">
+          <div>
+            <div class="nbhd-rank">${String(i+1).padStart(2,'0')} / ${escapeHtml(n.fitLabel || labels[i] || '')}</div>
+            <div class="nbhd-name">${escapeHtml(n.name)}</div>
+          </div>
+          <div class="${badgeClass}">${n.fitScore} fit</div>
+        </div>
+        <p class="nbhd-rationale">${escapeHtml(n.rationale)}</p>
+        <div class="nbhd-meta-grid">
+          <div class="nbhd-meta-item">
+            <div class="nbhd-meta-label">Schools</div>
+            <div class="nbhd-meta-value">${escapeHtml(String(n.schools?.rating))}<span style="font-size:0.7rem; color:var(--text-faint)">/10</span></div>
+            <div class="nbhd-meta-sub">${escapeHtml(n.schools?.topSchool || '')}</div>
+          </div>
+          <div class="nbhd-meta-item">
+            <div class="nbhd-meta-label">Commute</div>
+            <div class="nbhd-meta-value" style="font-size:0.82rem; line-height:1.3;">${escapeHtml(n.commute?.estimate || '')}</div>
+            ${n.commute?.note ? `<div class="nbhd-meta-sub">${escapeHtml(n.commute.note)}</div>` : ''}
+          </div>
+          <div class="nbhd-meta-item">
+            <div class="nbhd-meta-label">Lifestyle</div>
+            <div class="nbhd-lifestyle-tags" style="margin-top:4px;">${tags || '<span style="color:var(--text-faint);font-size:0.74rem;">—</span>'}</div>
+          </div>
+        </div>
+        <div class="nbhd-price-example">
+          <strong>At ${escapeHtml(c.budget)}:</strong> ${escapeHtml(n.priceExample)}
+        </div>
+        ${n.tradeoff ? `<div class="nbhd-tradeoff">Trade-off: ${escapeHtml(n.tradeoff)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderComparisonTable(guide, c) {
+  const comp = guide.comparison;
+  document.getElementById('comparisonIntro').textContent = comp.intro || '';
+
+  const topNbhd = guide.neighborhoods?.[0]?.name || 'Triangle';
+  const table = document.getElementById('comparisonTable');
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th></th>
+        <th>${escapeHtml(comp.originCity || c.originCity)}</th>
+        <th class="col-triangle">Triangle (${escapeHtml(topNbhd)} area)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${(comp.rows || []).map(row => `
+        <tr>
+          <td>${escapeHtml(row.category)}</td>
+          <td>${escapeHtml(row.originValue)}</td>
+          <td class="${row.triangleAdvantage ? 'win' : ''}">${escapeHtml(row.triangleValue)}</td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+function renderCTA(guide, c) {
+  const cta = guide.cta;
+  const h3 = document.getElementById('guideCtaHeadline');
+  h3.innerHTML = escapeHtml(cta.headline || 'Ready to tour your neighborhoods?')
+    .replace(/([^.!?]+[.!?]?)$/, (m) => m); // keep as-is, already escaped
+
+  const bodyText = [cta.body, cta.urgencyNote].filter(Boolean).join(' ');
+  document.getElementById('guideCtaBody').textContent = bodyText;
+
+  const btn = document.getElementById('guideCtaBtn');
+  if (c.agentContact) {
+    const contact = c.agentContact;
+    const emailMatch = contact.match(/[\w.+-]+@[\w.-]+\.\w+/);
+    const phoneMatch = contact.match(/[\d().\-+\s]{7,}/);
+    if (emailMatch) btn.onclick = () => window.location.href = `mailto:${emailMatch[0]}`;
+    else if (phoneMatch) btn.onclick = () => window.location.href = `tel:${phoneMatch[0].replace(/\s/g,'')}`;
+  }
+}
+</script>
+</body>
+</html>
