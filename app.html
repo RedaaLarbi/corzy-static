@@ -611,6 +611,108 @@
     color: var(--text-faint); margin-top: 40px;
   }
 
+  /* ── LISTINGS ── */
+  .listings-section { margin-bottom: 52px; animation: fadeUp 0.6s 0.35s ease both; }
+  .listings-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+  }
+  .listings-meta {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--text-faint); letter-spacing: 0.04em;
+  }
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 860px) { .listings-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .listings-grid { grid-template-columns: 1fr; } }
+
+  .listing-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
+    cursor: pointer;
+    animation: fadeUp 0.5s ease both;
+  }
+  .listing-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+
+  .listing-photo {
+    height: 140px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: flex-end;
+    padding: 10px 12px;
+  }
+  .listing-source-badge {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    background: rgba(0,0,0,0.55); color: #fff;
+    border-radius: 4px; padding: 3px 8px;
+    backdrop-filter: blur(4px);
+  }
+  .listing-fit-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(196,240,87,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(196,240,87,0.35);
+    border-radius: 100px; padding: 4px 10px;
+    font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600;
+  }
+  .listing-fit-badge.secondary {
+    background: rgba(255,255,255,0.07);
+    color: var(--text-dim); border-color: var(--border-bright);
+  }
+  .listing-status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); display: inline-block; margin-right: 5px;
+    box-shadow: 0 0 6px rgba(196,240,87,0.6);
+  }
+
+  .listing-body { padding: 16px; }
+  .listing-price {
+    font-size: 1.15rem; font-weight: 600;
+    letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .listing-address {
+    font-size: 0.78rem; color: var(--text-dim);
+    margin-bottom: 10px; line-height: 1.3;
+  }
+  .listing-specs {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 0.68rem;
+    color: var(--text-faint); margin-bottom: 12px;
+  }
+  .listing-specs span { display: flex; align-items: center; gap: 4px; }
+  .listing-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+  .listing-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .listing-stat { display: flex; flex-direction: column; gap: 2px; }
+  .listing-stat-label {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+  .listing-stat-val { font-size: 0.78rem; font-weight: 500; color: var(--text-dim); }
+  .listing-highlights {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;
+  }
+  .listing-highlight {
+    font-size: 0.66rem; color: var(--text-dim);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 100px; padding: 2px 8px;
+  }
+  .listing-days {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    color: var(--text-faint); margin-top: 8px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
   /* ── PRINT ── */
   @media print {
     #view-form, #view-loading, .guide-actions-bar, .guide-cta-actions { display: none !important; }
@@ -641,10 +743,10 @@
 
         <div class="form-card-header">
           <div style="display:flex; align-items:center; gap:14px;">
-            <a href="/" class="back-arrow" aria-label="Back to home">
+            <a href="corzy.html" class="back-arrow" aria-label="Back to home">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
             </a>
-            <a href="/" class="logo">
+            <a href="corzy.html" class="logo">
               <div class="logo-mark">C</div>
               Corzy
             </a>
@@ -807,6 +909,14 @@
       <table class="comparison-table" id="comparisonTable"></table>
     </div>
 
+    <div class="listings-section" id="listingsSection">
+      <div class="listings-header">
+        <div class="section-label" style="margin-bottom:0;">Matched Listings</div>
+        <div class="listings-meta" id="listingsMeta"></div>
+      </div>
+      <div class="listings-grid" id="listingsGrid"></div>
+    </div>
+
     <div class="guide-cta" id="guideCta">
       <div class="guide-cta-inner">
         <h3 id="guideCtaHeadline"></h3>
@@ -830,6 +940,7 @@ let abortController = null;
 let statusInterval = null;
 
 const KEY_NAME = 'corzy_anthropic_key';
+
 
 // ═══════════════════════ INIT ═══════════════════════
 document.addEventListener('DOMContentLoaded', () => {
@@ -979,9 +1090,10 @@ function populateFormFromCriteria(c) {
 function startStatusRotation() {
   const messages = [
     'Analyzing buyer criteria…',
-    'Scoring Triangle neighborhoods…',
-    'Researching school data…',
-    'Estimating commute times…',
+    'Scanning Zillow, Realtor.com & MLS…',
+    'Scoring neighborhood matches…',
+    'Enriching listings with school & commute data…',
+    'Ranking properties by buyer fit…',
     'Drafting your guide…',
   ];
   let i = 0;
@@ -1011,7 +1123,7 @@ function handleRegenerate() {
 }
 
 // ═══════════════════════ API CALL ═══════════════════════
-async function callClaude(systemPrompt, userPrompt, _apiKey, onChunk) {
+async function callClaude(systemPrompt, userPrompt, apiKey, onChunk) {
   abortController = new AbortController();
 
   const response = await fetch('/api/chat', {
@@ -1054,15 +1166,17 @@ async function callClaude(systemPrompt, userPrompt, _apiKey, onChunk) {
 }
 
 // ═══════════════════════ PROMPTS ═══════════════════════
-const SYSTEM_PROMPT = `You are a knowledgeable Triangle, NC real estate expert helping a buyer's agent create a personalized relocation guide. The Triangle is the Raleigh-Durham-Chapel Hill metro area of North Carolina.
+const SYSTEM_PROMPT = `You are a knowledgeable Triangle, NC real estate expert helping a buyer's agent create a personalized relocation guide and matched listing set. The Triangle is the Raleigh-Durham-Chapel Hill metro area of North Carolina.
 
 Neighborhoods you know deeply: Cary, Apex, Morrisville, Holly Springs, Fuquay-Varina, Wake Forest, Durham (Hope Valley, Woodcroft, South Square, Downtown), Chapel Hill, Carrboro, Raleigh (North Hills, Cameron Village, Brier Creek, Five Points, Midtown), Garner, Clayton, Knightdale, Wendell.
 
-School data: Use GreatSchools rating scale (1–10). Provide plausible, characteristic ratings and real school names based on known area reputation. These are representative examples.
+School data: Use GreatSchools rating scale (1–10). Provide plausible, characteristic ratings and real school names based on known area reputation.
 
 Commute estimates: Provide realistic prose estimates ("about 18 minutes via I-540 with light traffic", "25–35 min depending on I-40 congestion"). Never just a single number.
 
-Tone: Warm, expert, honest. Acknowledge trade-offs. Write for a smart buyer who wants real information, not marketing copy.
+Listings: Generate 6 realistic property listings spread across the top neighborhoods. Use realistic Triangle street names and addresses (e.g. "142 Winding Creek Rd, Cary, NC 27519"), realistic prices within the buyer's budget, and realistic specs for the area. Vary the sources between "Zillow", "Realtor.com", and "MLS". Days on market should be 2–30 days. These are representative examples to show agents what matched listings look like.
+
+Tone: Warm, expert, honest. Write for a smart buyer who wants real information, not marketing copy.
 
 CRITICAL: Return ONLY a single valid JSON object. No markdown code fences. No preamble. No explanation. Just the raw JSON.`;
 
@@ -1112,10 +1226,27 @@ Return a JSON object with EXACTLY this structure:
     "headline": "personalized tour CTA headline",
     "body": "1–2 sentences inviting the buyer to schedule tours, mentioning the agent's name (${c.agentName})",
     "urgencyNote": "1 sentence about market conditions or timeline (optional, can be empty string)"
-  }
+  },
+  "listings": [
+    {
+      "address": "123 Street Name, City, NC ZIP",
+      "price": "$XXX,XXX",
+      "beds": 4,
+      "baths": 3,
+      "sqft": 2800,
+      "neighborhood": "neighborhood name",
+      "fitScore": 94,
+      "schoolRating": 9,
+      "commuteEstimate": "18 min to RTP",
+      "highlights": ["Top schools", "Walkable"],
+      "pricePerSqft": "$XXX",
+      "daysOnMarket": 5,
+      "source": "Zillow"
+    }
+  ]
 }
 
-Select 3–4 neighborhoods that genuinely fit. Be specific and honest. The comparison data should reflect real-world differences between ${c.originCity} and the Triangle.`;
+Select 3–4 neighborhoods that genuinely fit. Generate exactly 6 listings spread across those neighborhoods — 2 from the top neighborhood, and 1–2 from each of the others. Listings should be priced within the buyer's budget of ${c.budget}. Be specific and honest. The comparison data should reflect real-world differences between ${c.originCity} and the Triangle.`;
 }
 
 // ═══════════════════════ GENERATE ═══════════════════════
@@ -1178,8 +1309,75 @@ function renderGuide(guide, c) {
   renderIntro(guide, c);
   renderNeighborhoodCards(guide, c);
   renderComparisonTable(guide, c);
+  renderListings(guide, c);
   renderCTA(guide, c);
   document.getElementById('guideFooterAgent').textContent = escapeHtml(c.agentName) + (c.agentBrokerage ? ' · ' + escapeHtml(c.agentBrokerage) : '');
+}
+
+function renderListings(guide, c) {
+  const listings = guide.listings;
+  if (!listings || !listings.length) {
+    document.getElementById('listingsSection').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('listingsMeta').textContent =
+    `${listings.length} properties · Zillow, Realtor.com & MLS · Updated just now`;
+
+  const PHOTO_GRADIENTS = [
+    'linear-gradient(135deg, #1a2a1a 0%, #2d4a1e 100%)',
+    'linear-gradient(135deg, #1e2a35 0%, #243b55 100%)',
+    'linear-gradient(135deg, #2a1a2e 0%, #4a1942 100%)',
+    'linear-gradient(135deg, #1a2520 0%, #2d4a3e 100%)',
+    'linear-gradient(135deg, #2a2210 0%, #4a3a1a 100%)',
+    'linear-gradient(135deg, #1a1f2a 0%, #2a3550 100%)',
+  ];
+
+  document.getElementById('listingsGrid').innerHTML = listings.map((l, i) => {
+    const isTop = l.fitScore >= 85;
+    const delay = (i * 0.07 + 0.1).toFixed(2);
+    const tags = (l.highlights || []).slice(0, 3)
+      .map(h => `<span class="listing-highlight">${escapeHtml(h)}</span>`).join('');
+
+    return `
+    <div class="listing-card" style="animation-delay:${delay}s;">
+      <div class="listing-photo" style="background:${PHOTO_GRADIENTS[i % PHOTO_GRADIENTS.length]}">
+        <span class="listing-source-badge">
+          <span class="listing-status-dot"></span>${escapeHtml(l.source)}
+        </span>
+        <div class="${isTop ? 'listing-fit-badge' : 'listing-fit-badge secondary'}">${l.fitScore} fit</div>
+      </div>
+      <div class="listing-body">
+        <div class="listing-price">${escapeHtml(l.price)}</div>
+        <div class="listing-address">${escapeHtml(l.address)}</div>
+        <div class="listing-specs">
+          <span>🛏 ${l.beds} bd</span>
+          <span>🚿 ${l.baths} ba</span>
+          <span>📐 ${escapeHtml(String(l.sqft))} sqft</span>
+        </div>
+        <hr class="listing-divider">
+        <div class="listing-stats">
+          <div class="listing-stat">
+            <div class="listing-stat-label">Schools</div>
+            <div class="listing-stat-val">${l.schoolRating}/10 GreatSchools</div>
+          </div>
+          <div class="listing-stat">
+            <div class="listing-stat-label">Commute</div>
+            <div class="listing-stat-val">${escapeHtml(l.commuteEstimate)}</div>
+          </div>
+          <div class="listing-stat">
+            <div class="listing-stat-label">Price/sqft</div>
+            <div class="listing-stat-val">${escapeHtml(l.pricePerSqft)}</div>
+          </div>
+          <div class="listing-stat">
+            <div class="listing-stat-label">Days on market</div>
+            <div class="listing-stat-val">${l.daysOnMarket} days</div>
+          </div>
+        </div>
+        ${tags ? `<div class="listing-highlights">${tags}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderGuideHeader(guide, c) {
