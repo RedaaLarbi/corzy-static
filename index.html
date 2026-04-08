@@ -10,16 +10,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0b;
-    --bg-elev: #111114;
-    --bg-card: #15151a;
-    --border: #1f1f25;
-    --border-bright: #2a2a32;
+    --bg: #0a0e27;
+    --bg-elev: #121629;
+    --bg-card: #141829;
+    --border: #1a1f35;
+    --border-bright: #252a42;
     --text: #ffffff;
-    --text-dim: #b0b0bc;
-    --text-faint: #72727e;
-    --accent: #c4f057;
-    --accent-dim: #9bc442;
+    --text-dim: #b8c0d8;
+    --text-faint: #8890aa;
+    --accent: #38bdf8;
+    --accent-dim: #0284c7;
     --radius: 14px;
     --radius-sm: 8px;
     --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -68,7 +68,7 @@
     align-items: center;
     gap: 40px;
     padding: 14px 14px 14px 28px;
-    background: rgba(17, 17, 20, 0.7);
+    background: rgba(10, 14, 39, 0.85);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--border);
     border-radius: 100px;
@@ -143,7 +143,7 @@
     transform: translate(-50%, -30%);
     width: 1100px;
     height: 700px;
-    background: radial-gradient(ellipse, rgba(196, 240, 87, 0.18) 0%, rgba(196, 240, 87, 0.07) 30%, transparent 60%);
+    background: radial-gradient(ellipse, rgba(77, 124, 255, 0.18) 0%, rgba(77, 124, 255, 0.07) 30%, transparent 60%);
     pointer-events: none;
     z-index: 0;
   }
@@ -238,7 +238,7 @@
     gap: 8px;
     letter-spacing: -0.005em;
   }
-  .btn-primary:hover { background: #d6ff6b; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(196, 240, 87, 0.25); }
+  .btn-primary:hover { background: #7dd3fc; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(77, 124, 255, 0.25); }
 
   .btn-secondary {
     background: var(--bg-card);
@@ -304,7 +304,7 @@
     inset: -1px;
     border-radius: 16px;
     padding: 1px;
-    background: linear-gradient(180deg, rgba(196,240,87,0.3), transparent 30%);
+    background: linear-gradient(180deg, rgba(56,189,248,0.3), transparent 30%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -361,7 +361,7 @@
     color: var(--text-dim);
     margin-bottom: 2px;
   }
-  .ms-item.active { background: rgba(196,240,87,0.08); color: var(--accent); }
+  .ms-item.active { background: rgba(56,189,248,0.08); color: var(--accent); }
   .ms-item-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
 
   .mockup-main { padding: 22px 26px; }
@@ -434,12 +434,12 @@
     left: 0;
     right: 0;
     height: 60%;
-    background: linear-gradient(180deg, transparent, rgba(196,240,87,0.15));
+    background: linear-gradient(180deg, transparent, rgba(56,189,248,0.15));
   }
   .mm-row-title { font-size: 0.82rem; font-weight: 500; }
   .mm-row-meta { font-size: 0.7rem; color: var(--text-faint); margin-top: 2px; font-family: var(--font-mono); }
   .mm-row-score {
-    background: rgba(196,240,87,0.12);
+    background: rgba(56,189,248,0.12);
     color: var(--accent);
     padding: 4px 9px;
     border-radius: 5px;
@@ -533,7 +533,7 @@
     left: 50%;
     width: 50%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(196,240,87,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(56,189,248,0.3), transparent);
     opacity: 0;
     transition: opacity 0.4s;
   }
@@ -660,7 +660,7 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, rgba(196,240,87,0.4), transparent);
+    background: linear-gradient(90deg, rgba(56,189,248,0.4), transparent);
     opacity: 0.6;
   }
   .pain-icon {
@@ -739,13 +739,13 @@
   /* ─────────── CTA ─────────── */
   .final-cta {
     background: var(--bg-elev);
-    border: 1px solid rgba(196,240,87,0.35);
+    border: 1px solid rgba(56,189,248,0.35);
     border-radius: 24px;
     padding: 100px 40px;
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 0 80px rgba(196,240,87,0.08), inset 0 1px 0 rgba(196,240,87,0.12);
+    box-shadow: 0 0 80px rgba(56,189,248,0.08), inset 0 1px 0 rgba(56,189,248,0.12);
   }
   .final-cta::before {
     content: '';
@@ -755,7 +755,7 @@
     transform: translateX(-50%);
     width: 800px;
     height: 700px;
-    background: radial-gradient(circle, rgba(196,240,87,0.18), transparent 60%);
+    background: radial-gradient(circle, rgba(56,189,248,0.18), transparent 60%);
     pointer-events: none;
   }
   .final-cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
@@ -858,7 +858,7 @@
     width: 100%;
     letter-spacing: -0.01em;
   }
-  .form-submit:hover { background: #d6ff6b; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(196,240,87,0.2); }
+  .form-submit:hover { background: #7dd3fc; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(56,189,248,0.2); }
   .form-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
   .form-note {
@@ -870,8 +870,8 @@
 
   .success {
     display: none;
-    background: rgba(196,240,87,0.08);
-    border: 1px solid rgba(196,240,87,0.25);
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.25);
     border-radius: var(--radius);
     color: var(--accent);
     font-size: 0.95rem;
@@ -957,7 +957,6 @@
 
 <nav>
   <a href="#" class="logo">
-    <div class="logo-mark">C</div>
     Corzy
   </a>
   <div class="nav-links">
@@ -965,7 +964,7 @@
     <a href="#how">How it works</a>
     <a href="#waitlist">Waitlist</a>
   </div>
-  <a href="app.html" class="nav-cta">Try the app →</a>
+  <a href="/app.html" class="nav-cta">Try the app →</a>
 </nav>
 
 <!-- ─────────── HERO ─────────── -->
@@ -973,20 +972,20 @@
   <div class="hero-inner">
     <div class="pill">
       <span class="pill-tag">NEW</span>
-      Built for Triangle-area real estate agents
+      Built for real estate agents
     </div>
 
     <h1>
-      The fastest way<br>
-      to find and close <em>the right</em> properties.
+      One workspace.<br>
+      Every listing. <em>The right match</em> — instantly.
     </h1>
 
     <p class="hero-sub">
-      Corzy helps real estate agents qualify buyers, surface the right listings, and turn first conversations into closed deals.
+      Capture buyer requirements once. Corzy consolidates listings from every major marketplace, enriches them with the analytics that matter, and surfaces the best matches so you respond faster and close more.
     </p>
 
     <div class="cta-row">
-      <a href="app.html" class="btn-primary">
+      <a href="/app.html" class="btn-primary">
         Try the app
         <span>→</span>
       </a>
@@ -995,7 +994,7 @@
 
     <div class="hero-meta">
       <span class="hero-meta-dot"></span>
-      Now onboarding design partners in Raleigh, Durham &amp; Chapel Hill
+      Now onboarding agents across the US competitive market
     </div>
   </div>
 
@@ -1078,41 +1077,41 @@
 <section class="pain">
   <div class="pain-header">
     <div class="section-label">The problem</div>
-    <h2>Right now, your workflow is <em>fragmented, inconsistent,</em> and impossible to scale.</h2>
-    <p>Most agents piece together their process from a dozen different tools — and still lose deals to whoever moves faster.</p>
+    <h2>Right now, your workflow is <em>fragmented, slow,</em> and costing you deals.</h2>
+    <p>Top agents lose listings not because they don't work hard — but because their tools don't work together. Corzy fixes that.</p>
   </div>
   <div class="pain-grid">
     <div class="pain-card">
       <div class="pain-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       </div>
-      <h4>Scattered spreadsheets</h4>
-      <p>Buyer criteria, listing notes, and follow-up tasks living across Google Sheets, email threads, and sticky notes.</p>
-      <span class="pain-badge">Hours lost weekly</span>
+      <h4>Listings split across platforms</h4>
+      <p>Zillow, Realtor.com, MLS, Redfin — the right property exists, but finding it means switching tabs and losing time on every search.</p>
+      <span class="pain-badge">4–6 platforms per search</span>
     </div>
     <div class="pain-card">
       <div class="pain-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
       </div>
-      <h4>Manual MLS searches</h4>
-      <p>Manually filtering hundreds of listings to find the three that actually fit — then doing it again the next day.</p>
+      <h4>No data where you need it</h4>
+      <p>School ratings, commute times, price trends, walkability — scattered across five different tools while your buyer waits for an answer.</p>
       <span class="pain-badge">2–4 hrs per buyer</span>
     </div>
     <div class="pain-card">
       <div class="pain-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
-      <h4>Generic follow-ups</h4>
-      <p>Copy-paste emails that don't reflect what the buyer actually said — costing you trust at the most critical moments.</p>
-      <span class="pain-badge">Low response rates</span>
+      <h4>Slow responses lose deals</h4>
+      <p>In a competitive market, the agent who responds first wins. Manual workflows mean you're always a step behind the agent who moves faster.</p>
+      <span class="pain-badge">Deals lost to speed</span>
     </div>
     <div class="pain-card">
       <div class="pain-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
       </div>
-      <h4>No single source of truth</h4>
-      <p>Your pipeline lives in your head. When you're juggling 10 buyers, things fall through the cracks — every time.</p>
-      <span class="pain-badge">Deals lost to gaps</span>
+      <h4>Buyer criteria re-entered everywhere</h4>
+      <p>You collect requirements in a call, re-type them into MLS, re-explain them in emails, and re-filter from scratch every time a new listing hits.</p>
+      <span class="pain-badge">Hours lost weekly</span>
     </div>
   </div>
 </section>
@@ -1122,10 +1121,10 @@
   <div class="container">
     <div class="section-label">Features</div>
     <h2 class="section-title">
-      Everything you need to <em>move buyers</em> from inquiry to keys.
+      Everything you need to <em>move faster</em> than the competition.
     </h2>
     <p class="section-sub">
-      Corzy replaces the spreadsheets, the back-and-forth emails, and the hours of manual research with one workspace built for the way agents actually work.
+      One workspace that captures buyer requirements once, pulls listings from every major marketplace, enriches them with real data, and surfaces the best matches — automatically.
     </p>
 
     <div class="features">
@@ -1133,12 +1132,12 @@
         <div>
           <div class="feature-num">01 / Smart matching</div>
           <h3>Corzy knows what your buyer actually wants</h3>
-          <p>Corzy turns a free-form buyer conversation into a structured profile, then ranks every active listing in your market by fit — schools, commute, lifestyle, budget, and the things buyers don't even know to ask for.</p>
+          <p>Capture buyer requirements once — budget, commute, schools, lifestyle. Corzy cross-references every active listing across Zillow, Realtor.com, MLS, and more, then ranks them by true fit so you always send the right three, not the first thirty.</p>
         </div>
         <div class="feature-viz">
           <div class="bar-chart">
             <div class="bar" style="height:30%" data-label="MLS"></div>
-            <div class="bar" style="height:45%" data-label="Filter"></div>
+            <div class="bar" style="height:45%" data-label="Zillow"></div>
             <div class="bar" style="height:60%" data-label="Score"></div>
             <div class="bar active" style="height:90%" data-label="Match"></div>
             <div class="bar" style="height:50%" data-label="Tour"></div>
@@ -1150,19 +1149,19 @@
       <div class="feature">
         <div class="feature-num">02</div>
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         </div>
-        <h3>Hyper-local intelligence</h3>
-        <p>Corzy gives you deep market context, school data, and lifestyle insights for your local area — the kind of knowledge agents usually take years to build up.</p>
+        <h3>Every marketplace, one view</h3>
+        <p>Zillow, Realtor.com, Redfin, MLS — consolidated in real time. No more tab switching. No more missed listings. Every property your buyer could want, in one place.</p>
       </div>
 
       <div class="feature">
         <div class="feature-num">03</div>
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <h3>Branded buyer briefs</h3>
-        <p>Generate beautiful, personalized neighborhood and property briefs in your brand. What used to take half a day now takes ninety seconds — and looks better.</p>
+        <h3>Enriched with the data that closes deals</h3>
+        <p>Every listing automatically enriched with school ratings, commute times, price trends, neighborhood walkability, and market velocity — so your recommendation is always backed by data.</p>
       </div>
 
       <div class="feature">
@@ -1170,17 +1169,17 @@
         <div class="feature-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <h3>Pipeline that thinks ahead</h3>
-        <p>Corzy watches every buyer in your pipeline, surfaces new listings the moment they hit market, and tells you which conversations need attention today.</p>
+        <h3>Instant alerts, zero lag</h3>
+        <p>The moment a matching listing hits any marketplace, your buyer knows. In a competitive market, being first isn't luck — it's the right system alerting you before anyone else.</p>
       </div>
 
       <div class="feature">
         <div class="feature-num">05</div>
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
-        <h3>Built for how you work</h3>
-        <p>Works alongside your CRM, your MLS, and your inbox. No new processes to learn. Corzy fits into your day, not the other way around.</p>
+        <h3>Branded briefs in seconds</h3>
+        <p>Turn any match into a beautiful, personalized buyer brief — your name, your brand, real data. Share in one click. What used to take half a day now takes under a minute.</p>
       </div>
     </div>
   </div>
@@ -1190,24 +1189,24 @@
 <section id="how" style="padding-top: 40px;">
   <div class="container">
     <div class="section-label">How it works</div>
-    <h2 class="section-title">From cold lead to <em>closing day</em>, in three moves.</h2>
-    <p class="section-sub">A workflow designed around real agents and real buyers — not buzzwords.</p>
+    <h2 class="section-title">From first call to <em>closed deal</em>, in three steps.</h2>
+    <p class="section-sub">A workflow built for speed — because in a competitive market, the agent who moves fastest wins.</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">i.</div>
-        <h4>Add your buyer</h4>
-        <p>Paste a chat, forward an email, or have Corzy interview them directly. It builds a structured profile in seconds.</p>
+        <h4>Capture requirements once</h4>
+        <p>Enter buyer criteria a single time — budget, location, commute, schools, lifestyle. Corzy builds a structured profile that drives everything that comes next.</p>
       </div>
       <div class="step">
         <div class="step-num">ii.</div>
-        <h4>Get matched listings</h4>
-        <p>Corzy scans every active listing, ranks them by fit, and explains the why behind each pick — so you walk into every conversation prepared.</p>
+        <h4>Get enriched matches instantly</h4>
+        <p>Corzy scans Zillow, Realtor.com, MLS, and more in real time — enriching every result with school data, commute estimates, and price trends — then ranks them by fit.</p>
       </div>
       <div class="step">
         <div class="step-num">iii.</div>
-        <h4>Send and close</h4>
-        <p>Generate a branded buyer brief, share it in one click, and let Corzy track interest, schedule showings, and surface next steps automatically.</p>
+        <h4>Respond fast, close more</h4>
+        <p>Send a branded brief in one click. Get alerted the moment a better match appears. Let Corzy keep your pipeline moving so no deal slips through the cracks.</p>
       </div>
     </div>
   </div>
@@ -1218,9 +1217,9 @@
   <div class="container">
     <div class="final-cta">
       <div class="final-cta-inner">
-        <div class="section-label" style="justify-content: center; display: inline-flex; background: rgba(196,240,87,0.1); border: 1px solid rgba(196,240,87,0.3); border-radius: 100px; padding: 6px 16px; margin-bottom: 24px; color: var(--accent);">Free trial · Limited spots</div>
-        <h2>Be one of the first <em>agents</em> on Corzy.</h2>
-        <p>Join the waitlist and get free access during our private beta. We're onboarding a small group of agents to shape what Corzy becomes.</p>
+        <div class="section-label" style="justify-content: center; display: inline-flex; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 100px; padding: 6px 16px; margin-bottom: 24px; color: var(--accent);">Free trial · Limited spots</div>
+        <h2>Get early access to the <em>workspace</em> built to win.</h2>
+        <p>Join the waitlist and get free access during our private beta. We're onboarding a small group of agents to shape the future of Corzy — and close more deals in the process.</p>
 
         <form class="waitlist-form" id="waitlistForm">
           <div class="form-grid">
