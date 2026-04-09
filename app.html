@@ -1313,6 +1313,13 @@ function renderGuide(guide, c) {
   document.getElementById('guideFooterAgent').textContent = escapeHtml(c.agentName) + (c.agentBrokerage ? ' · ' + escapeHtml(c.agentBrokerage) : '');
 }
 
+function buildListingUrl(source, neighborhood) {
+  const city = encodeURIComponent((neighborhood || 'Cary').replace(/\s+/g, '-'));
+  const cityPlain = encodeURIComponent((neighborhood || 'Cary').replace(/\s+/g, '_'));
+  if (source === 'Realtor.com') return `https://www.realtor.com/realestateandhomes-search/${cityPlain}_NC`;
+  return `https://www.zillow.com/homes/for_sale/${city}-NC_rb/`;
+}
+
 function renderListings(guide, c) {
   const listings = guide.listings;
   if (!listings || !listings.length) {
@@ -1321,7 +1328,7 @@ function renderListings(guide, c) {
   }
 
   document.getElementById('listingsMeta').textContent =
-    `${listings.length} properties · Zillow, Realtor.com & MLS · Updated just now`;
+    `${listings.length} properties · Zillow, Realtor.com & MLS · Click any listing to view →`;
 
   const PHOTO_GRADIENTS = [
     'linear-gradient(135deg, #1a2a1a 0%, #2d4a1e 100%)',
@@ -1337,12 +1344,13 @@ function renderListings(guide, c) {
     const delay = (i * 0.07 + 0.1).toFixed(2);
     const tags = (l.highlights || []).slice(0, 3)
       .map(h => `<span class="listing-highlight">${escapeHtml(h)}</span>`).join('');
+    const url = buildListingUrl(l.source, l.neighborhood);
 
     return `
-    <div class="listing-card" style="animation-delay:${delay}s;">
+    <a class="listing-card" href="${url}" target="_blank" rel="noopener noreferrer" style="animation-delay:${delay}s; display:block; text-decoration:none; color:inherit;">
       <div class="listing-photo" style="background:${PHOTO_GRADIENTS[i % PHOTO_GRADIENTS.length]}">
         <span class="listing-source-badge">
-          <span class="listing-status-dot"></span>${escapeHtml(l.source)}
+          <span class="listing-status-dot"></span>${escapeHtml(l.source)} ↗
         </span>
         <div class="${isTop ? 'listing-fit-badge' : 'listing-fit-badge secondary'}">${l.fitScore} fit</div>
       </div>
@@ -1375,7 +1383,7 @@ function renderListings(guide, c) {
         </div>
         ${tags ? `<div class="listing-highlights">${tags}</div>` : ''}
       </div>
-    </div>`;
+    </a>`;
   }).join('');
 }
 
