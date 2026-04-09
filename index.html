@@ -111,7 +111,7 @@
   @media (max-width: 640px) { .nav-links { display: none; } }
 
   .nav-cta {
-    background: var(--text);
+    background: var(--accent);
     color: var(--bg);
     padding: 11px 22px;
     border-radius: 100px;
@@ -119,7 +119,15 @@
     font-weight: 500;
     transition: all 0.2s;
   }
-  .nav-cta:hover { background: var(--accent); }
+  .nav-cta:hover { background: #7dd3fc; transform: translateY(-1px); }
+  .nav-cta-secondary {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    transition: color 0.2s;
+    text-align: right;
+    font-family: var(--font-sans);
+  }
+  .nav-cta-secondary:hover { color: var(--accent); }
 
   /* ─────────── HERO ─────────── */
   .hero {
@@ -965,7 +973,10 @@
     <a href="/rental.html">Find a Rental</a>
     <a href="#waitlist">Waitlist</a>
   </div>
-  <a href="/app.html" class="nav-cta">Find a home →</a>
+  <div style="display:flex; flex-direction:column; gap:5px; align-items:flex-end;">
+    <a href="/app.html" class="nav-cta">Find a home →</a>
+    <a href="/rental.html" class="nav-cta-secondary">Find a Rental →</a>
+  </div>
 </nav>
 
 <!-- ─────────── HERO ─────────── -->
